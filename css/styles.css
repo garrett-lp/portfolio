@@ -1,0 +1,180 @@
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #1e1e1e;
+    --fg: #ffffff;
+    --muted: #888;
+    --line: #333;
+    --max: 1100px;
+    --side: 180px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+
+  }
+
+  /* Pixel grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── NAV ── */
+  nav {
+    background: #2a2a2a;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 48px;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+  }
+  .nav-logo { font-weight: 700; font-size: 15px; color: var(--fg); text-decoration: none; }
+  .nav-links { display: flex; gap: 40px; }
+  .nav-links a { color: var(--fg); text-decoration: none; font-size: 13px; opacity: 0.85; transition: opacity 0.2s; }
+  .nav-links a:hover { opacity: 1; }
+
+  /* ── PAGE ── */
+  .page { max-width: var(--max); margin: 0 auto; padding: 0 48px; position: relative; z-index: 1; }
+
+  /* ── GARRETT ANIMATED SVG ── */
+  .garrett-anim {
+    width: clamp(100px, 14vw, 200px);
+    aspect-ratio: 1;
+    flex-shrink: 0;
+  }
+  .garrett-anim svg {
+    width: 100%;
+    height: 100%;
+  }
+
+
+  .project-link-btn {
+    display: inline-block;
+    margin-left: 16px;
+    padding: 8px 16px;
+    border: 1px solid var(--fg);
+    color: var(--fg);
+    text-decoration: none;
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.03em;
+    vertical-align: middle;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+  }
+  .project-link-btn:hover {
+    background: var(--fg);
+    color: var(--bg);
+  }
+
+  /* ── ABOUT ── */
+  .about {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 48px;
+    padding: 80px 0 96px;
+    align-items: start;
+  }
+  .about-text h1 { font-size: 17px; font-weight: 700; margin-bottom: 24px; }
+  .about-text p { color: rgba(255,255,255,0.82); margin-bottom: 16px; max-width: 660px; font-size: 13px; }
+
+  .sep { border: none; border-top: 1px solid var(--line); }
+
+  /* ── PROJECTS ── */
+  .project-section { padding: 80px 0; }
+  .project-headline { font-size: clamp(20px, 3vw, 28px); font-weight: 700; margin-bottom: 48px; max-width: 700px; line-height: 1.5; }
+  .project-visual {
+    width: 100%; aspect-ratio: 16/9;
+    background: #141414; border: 1px solid var(--line);
+    position: relative; margin-bottom: 40px;
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
+  }
+  .project-note { font-weight: 700; font-size: 14px; margin-bottom: 40px; }
+  .reasons { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; }
+  .reason-title { font-weight: 700; font-size: 16px; margin-bottom: 8px; }
+  .reason-body { color: rgba(255,255,255,0.6); font-size: 13px; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--line);
+    margin-top: 80px;
+    padding: 48px 0 40px;
+    position: relative;
+    z-index: 1;
+    background: #333333;
+  }
+  .footer-inner {
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 0 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: start;
+  }
+  .footer-currently h3 { font-size: 14px; font-weight: 700; margin-bottom: 16px; }
+  .footer-currently ul { list-style: none; }
+  .footer-currently ul li { font-size: 13px; color: rgba(255,255,255,0.75); padding: 8px 0; }
+  .footer-currently ul li::before { content: '• '; color: var(--fg); }
+
+  .footer-contact h3 { font-size: 14px; font-weight: 700; margin-bottom: 24px; }
+  .footer-icons { display: flex; gap: 40px; align-items: flex-start; }
+  .footer-icon-item {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    text-decoration: none; color: var(--fg); transition: opacity 0.2s;
+  }
+  .footer-icon-item:hover { opacity: 1; }
+
+  /* ── Footer icon SVG states ── */
+  .icon-wrap {
+    width: 48px;
+    height: 48px;
+    position: relative;
+    display: block;
+  }
+  .icon-svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    transition: opacity 0.1s;
+  }
+  .icon-default  { opacity: 1; }
+  .icon-hover    { opacity: 0; }
+  .icon-pressed  { opacity: 0; }
+
+  .footer-icon-item:hover .icon-default  { opacity: 0; }
+  .footer-icon-item:hover .icon-hover    { opacity: 1; }
+  .footer-icon-item:hover .icon-pressed  { opacity: 0; }
+
+  .footer-icon-item:active .icon-default { opacity: 0; }
+  .footer-icon-item:active .icon-hover   { opacity: 0; }
+  .footer-icon-item:active .icon-pressed { opacity: 1; }
+  .footer-icon-item canvas { image-rendering: pixelated; width: 42px; height: 42px; }
+  .footer-icon-item span { font-size: 12px; font-weight: 700; }
+
+  @media (max-width: 768px) {
+    nav { padding: 0 24px; }
+    .page { padding: 0 24px; }
+    .footer-inner { padding: 0 24px; grid-template-columns: 1fr; gap: 40px; }
+    .about { grid-template-columns: 1fr; gap: 24px; padding: 48px 0 64px; }
+    .reasons { grid-template-columns: 1fr; }
+
+  }
+</style>

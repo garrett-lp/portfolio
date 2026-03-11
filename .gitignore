@@ -1,0 +1,18 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node (if you add dependencies later)
+node_modules/
+package-lock.json
+
+# OS
+Thumbs.db

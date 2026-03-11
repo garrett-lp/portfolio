@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mortgage Renewal Tool — Garrett LP</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+<style>
+
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #1e1e1e;
+    --fg: #ffffff;
+    --muted: #888;
+    --line: #333;
+    --max: 1100px;
+    --side: 180px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+
+  }
+
+  /* Pixel grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── NAV ── */
+  nav {
+    background: #2a2a2a;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 48px;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+  }
+  .nav-logo { font-weight: 700; font-size: 15px; color: var(--fg); text-decoration: none; }
+  .nav-links { display: flex; gap: 40px; }
+  .nav-links a { color: var(--fg); text-decoration: none; font-size: 13px; opacity: 0.85; transition: opacity 0.2s; }
+  .nav-links a:hover { opacity: 1; }
+
+  /* ── PAGE ── */
+  .page { max-width: var(--max); margin: 0 auto; padding: 0 48px; position: relative; z-index: 1; }
+
+  /* ── GARRETT ANIMATED SVG ── */
+  .garrett-anim {
+    width: clamp(100px, 14vw, 200px);
+    aspect-ratio: 1;
+    flex-shrink: 0;
+  }
+  .garrett-anim svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .project-link-btn {
+    display: inline-block;
+    margin-left: 16px;
+    padding: 8px 16px;
+    border: 1px solid var(--fg);
+    color: var(--fg);
+    text-decoration: none;
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.03em;
+    vertical-align: middle;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+  }
+  .project-link-btn:hover {
+    background: var(--fg);
+    color: var(--bg);
+  }
+
+  /* ── ABOUT ── */
+  .about {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 48px;
+    padding: 80px 0 96px;
+    align-items: start;
+  }
+  .about-text h1 { font-size: 17px; font-weight: 700; margin-bottom: 24px; }
+  .about-text p { color: rgba(255,255,255,0.82); margin-bottom: 16px; max-width: 660px; font-size: 13px; }
+
+  .sep { border: none; border-top: 1px solid var(--line); }
+
+  /* ── PROJECTS ── */
+  .project-section { padding: 80px 0; }
+  .project-headline { font-size: clamp(20px, 3vw, 28px); font-weight: 700; margin-bottom: 48px; max-width: 700px; line-height: 1.5; }
+  .project-visual {
+    width: 100%; aspect-ratio: 16/9;
+    background: #141414; border: 1px solid var(--line);
+    position: relative; margin-bottom: 40px;
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
+  }
+  .project-note { font-weight: 700; font-size: 14px; margin-bottom: 40px; }
+  .reasons { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; }
+  .reason-title { font-weight: 700; font-size: 13px; margin-bottom: 8px; }
+  .reason-body { color: rgba(255,255,255,0.6); font-size: 13px; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--line);
+    margin-top: 80px;
+    padding: 48px 0 40px;
+    position: relative;
+    z-index: 1;
+    background: #333333;
+  }
+  .footer-inner {
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 0 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: start;
+  }
+  .footer-currently h3 { font-size: 14px; font-weight: 700; margin-bottom: 16px; }
+  .footer-currently ul { list-style: none; }
+  .footer-currently ul li { font-size: 13px; color: rgba(255,255,255,0.75); padding: 8px 0; }
+  .footer-currently ul li::before { content: '• '; color: var(--fg); }
+
+  .footer-contact h3 { font-size: 14px; font-weight: 700; margin-bottom: 24px; }
+  .footer-icons { display: flex; gap: 40px; align-items: flex-start; }
+  .footer-icon-item {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    text-decoration: none; color: var(--fg); transition: opacity 0.2s;
+  }
+  .footer-icon-item:hover { opacity: 1; }
+
+  /* ── Footer icon SVG states ── */
+  .icon-wrap {
+    width: 48px;
+    height: 48px;
+    position: relative;
+    display: block;
+  }
+  .icon-svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    transition: opacity 0.1s;
+  }
+  .icon-default  { opacity: 1; }
+  .icon-hover    { opacity: 0; }
+  .icon-pressed  { opacity: 0; }
+
+  .footer-icon-item:hover .icon-default  { opacity: 0; }
+  .footer-icon-item:hover .icon-hover    { opacity: 1; }
+  .footer-icon-item:hover .icon-pressed  { opacity: 0; }
+
+  .footer-icon-item:active .icon-default { opacity: 0; }
+  .footer-icon-item:active .icon-hover   { opacity: 0; }
+  .footer-icon-item:active .icon-pressed { opacity: 1; }
+  .footer-icon-item canvas { image-rendering: pixelated; width: 42px; height: 42px; }
+  .footer-icon-item span { font-size: 12px; font-weight: 700; }
+
+  @media (max-width: 768px) {
+    nav { padding: 0 24px; }
+    .page { padding: 0 24px; }
+    .footer-inner { padding: 0 24px; grid-template-columns: 1fr; gap: 40px; }
+    .about { grid-template-columns: 1fr; gap: 24px; padding: 48px 0 64px; }
+    .reasons { grid-template-columns: 1fr; }
+
+  }
+
+
+  /* ── Hero outcomes stats ── */
+  .project-hero-outcomes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    margin: 40px 0;
+    padding: 32px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .project-hero-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .stat-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--fg);
+    line-height: 1.5;
+  }
+  .stat-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.5;
+  }
+
+  /* ── Principle cards ── */
+  .subsection-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 32px;
+    margin-bottom: 16px;
+    display: block;
+  }
+  .principle-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .principle-card {
+    border: 1px solid var(--line);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: rgba(255,255,255,0.03);
+  }
+  .principle-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--fg);
+  }
+  .principle-body {
+    font-size: 13px;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.5;
+  }
+
+  /* ── Task list ── */
+  .task-list {
+    list-style: none;
+    margin-top: 16px;
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .task-list li {
+    font-size: 13px;
+    color: rgba(255,255,255,0.75);
+    padding-left: 16px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .task-list li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--muted);
+  }
+
+  @media (max-width: 768px) {
+    .project-hero-outcomes { grid-template-columns: 1fr; gap: 24px; }
+    .principle-cards { grid-template-columns: 1fr; }
+  }
+
+  /* ── PROJECT PAGE SPECIFIC ── */
+  .project-image-block {
+    width: 100%;
+    max-width: 720px;
+    margin-top: 32px;
+    margin-bottom: 64px;
+  }
+  .project-image-block img {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+  .project-page {
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 0 48px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .project-hero {
+    padding: 80px 0 64px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 64px;
+  }
+  .project-hero-inner {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .project-hero-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+
+  .project-hero h1 {
+    font-size: clamp(18px, 2.5vw, 26px);
+    font-weight: 700;
+    line-height: 1.5;
+    max-width: 800px;
+    margin-bottom: 24px;
+  }
+
+  .project-hero-summary {
+    font-size: 13px;
+    color: rgba(255,255,255,0.75);
+    line-height: 1.5;
+    max-width: 680px;
+  }
+
+  .project-body {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .project-section-block {
+    margin-bottom: 64px;
+  }
+
+  .project-section-block h2 {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--fg);
+  }
+
+  .project-section-block p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.75);
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+
+  .project-section-block p:last-child {
+    margin-bottom: 0;
+  }
+
+  .project-image-placeholder {
+    width: 100%;
+    max-width: 720px;
+    aspect-ratio: 16/9;
+    background: #141414;
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 40px;
+    margin-bottom: 64px;
+  }
+
+  .project-image-placeholder span {
+    font-size: 12px;
+    color: rgba(255,255,255,0.25);
+    font-family: var(--mono);
+    letter-spacing: 0.05em;
+  }
+
+  @media (max-width: 768px) {
+    .project-page { padding: 0 24px; }
+    .project-hero { padding: 48px 0 48px; margin-bottom: 48px; }
+    .project-hero-inner { max-width: 100%; }
+  }
+
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Garrett LP</a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="#">CV</a>
+  </div>
+</nav>
+
+<div class="project-page">
+
+  <div class="project-hero">
+    <div class="project-hero-inner">
+      <p class="project-hero-label">Case Study &nbsp;·&nbsp; Coast Capital Savings &nbsp;·&nbsp; 2024</p>
+      <h1>Mortgage Renewal Tool</h1>
+      <p class="project-hero-summary">The Mortgage Renewal Tool gave Coast Capital members a self-serve path through their renewal — reducing advisor workload and meeting members where they already were.</p>
+    </div>
+  </div>
+
+  <div class="project-body">
+
+    <div class="project-section-block">
+      <h2>Background</h2>
+      <p>Coast Capital's mortgage advisors had an existing internal tool to manage renewals on behalf of members, which served as the foundational model for what would become a member-facing self-service experience.</p>
+      <p>Digitizing this experience represented a clear business opportunity — capturing more incoming renewals by giving members the ability to move through the process on their own terms.</p>
+      <p>I joined as one of two designers after the principal UX Designer completed initial discovery, inheriting a solid research foundation and taking ownership from synthesis through to handoff.</p>
+    </div>
+
+    <div class="project-image-placeholder">
+      <span>Placeholder 1 — Before / After: Advisor tool vs. member-facing tool</span>
+    </div>
+
+    <div class="project-section-block">
+      <h2>Problem</h2>
+      <p>Stakeholder feedback identified that the existing process caused delays in the lending pipeline — errors introduced during manual handling created back-and-forth between members and advisors that slowed renewals down unnecessarily.</p>
+      <p>Members had no visibility into where they stood in the process and no ability to act on their renewal outside of business hours.</p>
+    </div>
+
+    <div class="project-image-placeholder">
+      <span>Placeholder 2 — Key stakeholder insight callout</span>
+    </div>
+
+    <div class="project-section-block">
+      <h2>Process</h2>
+      <p>With discovery research already completed by the principal designer, my focus turned to translating those insights into a coherent design direction. I led a competitive analysis, benchmarking how other financial institutions were handling self-serve renewal flows — specifically how rate selection, identity verification, and disclosure presentation were being approached across the market.</p>
+      <p>Operating without a dedicated digital product manager, we found it more effective to develop key screens early and work backwards — letting the visualisations surface gaps in requirements and helping us drive pace to meet development deadlines.</p>
+      <p>Usability testing was conducted with internal staff who held active mortgages up for renewal — a pragmatic workaround given budget constraints — which produced honest gut-check reactions to the design assumptions we were making.</p>
+      <p>The principal designer remained an active voice in design reviews throughout, ensuring continuity between the original discovery intent and our execution direction.</p>
+
+      <p class="subsection-label">Design principles</p>
+      <div class="principle-cards">
+        <div class="principle-card">
+          <span class="principle-title">Simple</span>
+          <span class="principle-body">Minimise the number of steps a member needs to take to complete their renewal intake. Surface only what's relevant at each stage, and keep the path to completion clear.</span>
+        </div>
+        <div class="principle-card">
+          <span class="principle-title">Educative</span>
+          <span class="principle-body">Present rate and term information in plain language when members need it most, supported by strategic FAQ content to help new renewers understand the tool and how their inputs shaped their results.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="project-image-placeholder">
+      <span>Placeholder 3 — Competitor benchmarking grid</span>
+    </div>
+
+    <div class="project-image-placeholder">
+      <span>Placeholder 4 — Key screen: Rate and term selection</span>
+    </div>
+
+    <div class="project-section-block">
+      <h2>Challenges</h2>
+      <p>The most persistent tension was balancing simplicity with regulatory disclosure requirements. The volume of required legal language posed a real risk of overwhelming members at the exact moment we needed them to feel confident.</p>
+      <p>Every iteration of the disclosure presentation required negotiation between what compliance needed present, what the experience needed to feel manageable, and what felt natural and relevant within existing design patterns.</p>
+      <p>Stakeholder alignment across product leadership, the development team, and compliance was an ongoing part of the design process — requiring us to frame decisions in the language of each audience and know when to hold ground on experience quality.</p>
+    </div>
+
+    <div class="project-image-placeholder">
+      <span>Placeholder 5 — Disclosure design: Before / After</span>
+    </div>
+
+    <div class="project-section-block">
+      <h2>Outcomes</h2>
+      <p>The Mortgage Renewal Tool launched in production, marking Coast Capital's first self-service digital entry point into the renewal journey. Document finalisation remains advisor-assisted for now, with the tool designed as a phase-one foundation built to support further automation as the platform matures.</p>
+      <p>Sharing the lead design role on this project sharpened my ability to navigate complex stakeholder environments and deliver at a scale I hadn't previously worked at.</p>
+    </div>
+
+    <div class="project-image-placeholder">
+      <span>Placeholder 6</span>
+    </div>
+
+  </div>
+
+</div>
+
+<footer id="site-footer">
+  <div class="footer-inner">
+    <div class="footer-currently">
+      <h3>Currently</h3>
+      <ul>
+        <li>Reading - Stoner, John Williams</li>
+        <li>Playing - Arc Raiders</li>
+        <li>Curious about - Generative AI and UX Design</li>
+      </ul>
+    </div>
+    <div class="footer-contact">
+      <h3>Want to work together? Let's chat!</h3>
+      <div class="footer-icons">
+        <a href="#" class="footer-icon-item">
+          <span class="icon-wrap">
+          <svg class="icon-svg icon-default" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%"><path d="M54 37H34V57H9V7H54V37ZM54 47H49V52H44V57H39V42H54V47ZM14 37H29V32H14V37ZM14 27H49V22H14V27ZM14 17H49V12H14V17Z" fill="white"/></svg>
+          <svg class="icon-svg icon-hover" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%"><path d="M54 37H34V57H9V7H54V37ZM54 47H49V52H44V57H39V42H54V47ZM14 37H29V32H14V37ZM14 27H49V22H14V27ZM14 17H49V12H14V17Z" fill="white"/>
+<rect x="14" y="12" width="5" height="5" fill="#707070"/>
+<rect x="14" y="22" width="5" height="5" fill="#707070"/>
+<rect x="14" y="32" width="5" height="5" fill="#707070"/>
+<rect x="34" y="37" width="5" height="5" fill="#707070"/>
+<rect x="49" y="37" width="5" height="5" fill="#707070"/>
+<rect x="19" y="12" width="5" height="5" fill="#707070"/>
+<rect x="19" y="22" width="5" height="5" fill="#707070"/>
+<rect x="19" y="32" width="5" height="5" fill="#707070"/>
+<rect x="39" y="37" width="5" height="5" fill="#707070"/>
+<rect x="34" y="42" width="5" height="5" fill="#707070"/>
+<rect x="24" y="32" width="5" height="5" fill="#707070"/>
+<rect x="44" y="37" width="5" height="5" fill="#707070"/>
+<rect x="34" y="47" width="5" height="5" fill="#707070"/>
+<rect x="34" y="52" width="5" height="5" fill="#707070"/>
+<rect x="24" y="12" width="5" height="5" fill="#707070"/>
+<rect x="24" y="22" width="5" height="5" fill="#707070"/>
+<rect x="29" y="12" width="5" height="5" fill="#707070"/>
+<rect x="29" y="22" width="5" height="5" fill="#707070"/>
+<rect x="34" y="12" width="5" height="5" fill="#707070"/>
+<rect x="34" y="22" width="5" height="5" fill="#707070"/>
+<rect x="39" y="12" width="5" height="5" fill="#707070"/>
+<rect x="39" y="22" width="5" height="5" fill="#707070"/>
+<rect x="44" y="12" width="5" height="5" fill="#707070"/>
+<rect x="44" y="22" width="5" height="5" fill="#707070"/></svg>
+          <svg class="icon-svg icon-pressed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%"><path d="M54 37H34V57H9V7H54V37ZM54 47H49V52H44V57H39V42H54V47ZM14 37H29V32H14V37ZM14 27H49V22H14V27ZM14 17H49V12H14V17Z" fill="#707070"/></svg>
+          </span>
+          <span>CV</span>
+        </a>
+        <a href="/cdn-cgi/l/email-protection#6d0a01081f03081f2d01041b08430e0200" class="footer-icon-item">
+          <span class="icon-wrap">
+          <svg class="icon-svg icon-default" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%"><path d="M54 20H49V25H44V30H39V35H24V30H19V35H24V40H39V35H44V30H49V25H54V50H9V25H14V30H19V25H14V20H9V15H54V20Z" fill="white"/></svg>
+          <svg class="icon-svg icon-hover" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%"><path d="M54 20H49V25H44V30H39V35H24V30H19V35H24V40H39V35H44V30H49V25H54V50H9V25H14V30H19V25H14V20H9V15H54V20Z" fill="white"/>
+<rect x="9" y="20" width="5" height="5" fill="#707070"/>
+<rect x="14" y="25" width="5" height="5" fill="#707070"/>
+<rect x="19" y="30" width="5" height="5" fill="#707070"/>
+<rect x="24" y="35" width="5" height="5" fill="#707070"/>
+<rect x="29" y="35" width="5" height="5" fill="#707070"/>
+<rect x="34" y="35" width="5" height="5" fill="#707070"/>
+<rect x="39" y="30" width="5" height="5" fill="#707070"/>
+<rect x="44" y="25" width="5" height="5" fill="#707070"/>
+<rect x="49" y="20" width="5" height="5" fill="#707070"/></svg>
+          <svg class="icon-svg icon-pressed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%"><path d="M54 20H49V25H44V30H39V35H24V30H19V35H24V40H39V35H44V30H49V25H54V50H9V25H14V30H19V25H14V20H9V15H54V20Z" fill="#707070"/></svg>
+          </span>
+          <span>Email</span>
+        </a>
+        <a href="https://www.linkedin.com/in/garrettlp/" class="footer-icon-item">
+          <span class="icon-wrap">
+          <svg class="icon-svg icon-default" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%"><path d="M22 52H12V27H22V52ZM52 52H42V37H37V52H27V27H52V52ZM22 22H12V12H22V22Z" fill="white"/></svg>
+          <svg class="icon-svg icon-hover" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%"><path d="M22 52H12V27H22V52ZM52 52H42V37H37V52H27V27H52V52ZM22 22H12V12H22V22Z" fill="white"/>
+<rect x="37" y="37" width="5" height="5" fill="#707070"/>
+<rect x="37" y="42" width="5" height="5" fill="#707070"/>
+<rect x="37" y="47" width="5" height="5" fill="#707070"/>
+<rect x="22" y="32" width="5" height="5" fill="#707070"/>
+<rect x="22" y="42" width="5" height="5" fill="#707070"/>
+<rect x="22" y="47" width="5" height="5" fill="#707070"/>
+<rect x="22" y="27" width="5" height="5" fill="#707070"/>
+<rect x="22" y="37" width="5" height="5" fill="#707070"/></svg>
+          <svg class="icon-svg icon-pressed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%"><path d="M22 52H12V27H22V52ZM52 52H42V37H37V52H27V27H52V52ZM22 22H12V12H22V22Z" fill="#707070"/></svg>
+          </span>
+          <span>LinkedIn</span>
+        </a>
+        <a href="https://dribbble.com/garrett_lp" class="footer-icon-item">
+          <span class="icon-wrap">
+          <svg class="icon-svg icon-default" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%"><path d="M35 55H20V50H25V45H35V55ZM55 45H50V50H45V55H40V40H45V35H55V45ZM30 35H35V40H25V45H20V50H15V45H10V35H20V30H30V35ZM50 20H55V30H45V35H35V25H40V20H45V15H50V20ZM25 20H30V25H20V30H10V20H15V15H20V10H25V20ZM45 15H40V20H30V10H45V15Z" fill="white"/></svg>
+          <svg class="icon-svg icon-hover" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%"><path d="M35 55H20V50H25V45H35V55ZM55 45H50V50H45V55H40V40H45V35H55V45ZM30 35H35V40H25V45H20V50H15V45H10V35H20V30H30V35ZM50 20H55V30H45V35H35V25H40V20H45V15H50V20ZM25 20H30V25H20V30H10V20H15V15H20V10H25V20ZM45 15H40V20H30V10H45V15Z" fill="white"/>
+<rect x="10" y="30" width="5" height="5" fill="#707070"/>
+<rect x="15" y="30" width="5" height="5" fill="#707070"/>
+<rect x="20" y="25" width="5" height="5" fill="#707070"/>
+<rect x="25" y="25" width="5" height="5" fill="#707070"/>
+<rect x="30" y="20" width="5" height="5" fill="#707070"/>
+<rect x="35" y="20" width="5" height="5" fill="#707070"/>
+<rect x="40" y="15" width="5" height="5" fill="#707070"/>
+<rect x="25" y="10" width="5" height="5" fill="#707070"/>
+<rect x="25" y="15" width="5" height="5" fill="#707070"/>
+<rect x="30" y="25" width="5" height="5" fill="#707070"/>
+<rect x="30" y="30" width="5" height="5" fill="#707070"/>
+<rect x="40" y="35" width="5" height="5" fill="#707070"/>
+<rect x="35" y="35" width="5" height="5" fill="#707070"/>
+<rect x="35" y="40" width="5" height="5" fill="#707070"/>
+<rect x="35" y="45" width="5" height="5" fill="#707070"/>
+<rect x="35" y="50" width="5" height="5" fill="#707070"/>
+<rect x="30" y="40" width="5" height="5" fill="#707070"/>
+<rect x="25" y="40" width="5" height="5" fill="#707070"/>
+<rect x="20" y="45" width="5" height="5" fill="#707070"/>
+<rect x="45" y="30" width="5" height="5" fill="#707070"/>
+<rect x="50" y="30" width="5" height="5" fill="#707070"/></svg>
+          <svg class="icon-svg icon-pressed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%"><path d="M35 55H20V50H25V45H35V55ZM55 45H50V50H45V55H40V40H45V35H55V45ZM30 35H35V40H25V45H20V50H15V45H10V35H20V30H30V35ZM50 20H55V30H45V35H35V25H40V20H45V15H50V20ZM25 20H30V25H20V30H10V20H15V15H20V10H25V20ZM45 15H40V20H30V10H45V15Z" fill="#707070"/></svg>
+          </span>
+          <span>Dribbble</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
