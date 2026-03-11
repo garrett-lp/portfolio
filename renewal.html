@@ -388,6 +388,20 @@
   }
 
 </style>
+<script>
+  (function() {
+    var entered = sessionStorage.getItem('renewal_auth');
+    if (!entered) {
+      var pw = prompt('This page is password protected. Enter password:');
+      if (pw !== 'mrtss2025') {
+        document.documentElement.innerHTML = '';
+        window.location.replace('index.html');
+      } else {
+        sessionStorage.setItem('renewal_auth', '1');
+      }
+    }
+  })();
+</script>
 </head>
 <body>
 
@@ -597,5 +611,6 @@
   </div>
 </footer>
 
+<script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
